@@ -1,0 +1,7 @@
+numpy
+pandas
+requests
+opencv-python
+google-cloud-storage
+google-api-core
+openpyxl

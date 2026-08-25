@@ -1,4 +1,3 @@
-import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -7,20 +6,23 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-from trigger_detection.phase_pipeline_common import (
+PACKAGE_PARENT = Path(__file__).resolve().parents[2]
+if str(PACKAGE_PARENT) not in sys.path:
+    sys.path.insert(0, str(PACKAGE_PARENT))
+
+from trigger_detection.common.phase_pipeline_common import (
     build_release_info_from_frame,
     load_json_or_csv,
     load_keypoints_csv,
     normalize_keypoint_dataframe,
 )
+from trigger_detection.config import OUTPUT_ROOT, REPO_ROOT, SEGMENT_MANIFEST_PATH
+from trigger_detection.trigger_core import compute_trigger_metrics as trigger_metrics
+from trigger_detection.trigger_core import feature_extraction as trigger_features
 
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-OVERLAP_MANIFEST = Path(__file__).resolve().parent / "data" / "segment_manifest.csv"
-OUTPUT_DIR = REPO_ROOT / "trigger_detection_outputs"
+OVERLAP_MANIFEST = SEGMENT_MANIFEST_PATH
+OUTPUT_DIR = OUTPUT_ROOT
 DETAILED_OUTPUT_CSV = OUTPUT_DIR / "smoothed_trigger_results.csv"
 SUMMARY_OUTPUT_CSV = OUTPUT_DIR / "smoothed_trigger_summary.csv"
 FEATURE_METRICS_JSON = OUTPUT_DIR / "smoothed_trigger_feature_metrics.json"
@@ -39,19 +41,6 @@ MIN_FACTOR_ACTIVE_FRACTION = 0.65
 MIN_CROSSED_FACTORS = 4
 KEYPOINT_FILTER_CONF_THRESH = 0.1
 MAX_GAP_INTERP = 5
-
-def _load_local_module(module_name: str, relative_path: str):
-    module_path = REPO_ROOT / relative_path
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Unable to load module from {module_path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-mod03 = _load_local_module("td03_smoothed", "trigger_detection/04_feature_extraction.py")
-mod04 = _load_local_module("td04_smoothed", "trigger_detection/05_compute_trigger_metrics.py")
 
 
 def _resolve_window_lengths(fps: float) -> tuple[int, int]:
@@ -277,7 +266,7 @@ def _compare_preload_and_loadup_movement(
     threshold_crossing_frames: Dict[str, List[int]] = {}
     crossed_factors: List[str] = []
 
-    for feature_name in mod04.BASE_FEATURE_COLUMNS:
+    for feature_name in trigger_metrics.BASE_FEATURE_COLUMNS:
         pre_amplitude = _movement_amplitude(baseline_df[feature_name])
         loadup_amplitude = _movement_amplitude(loadup_df[feature_name])
         minimum_change = _minimum_factor_change(feature_name, stride_width)
@@ -348,14 +337,14 @@ def detect_trigger_on_smoothed_keypoints(
         )
 
     feature_start_frame = min(baseline_start_frame, loadup_start_frame)
-    feature_df = mod03.compute_trigger_feature_dataframe(
+    feature_df = trigger_features.compute_trigger_feature_dataframe(
         bowler_keypoints_df=keypoints_df,
         start_frame=feature_start_frame,
         end_frame=release_frame_int,
         stance_start_frame=baseline_start_frame,
         stance_end_frame=baseline_end_frame,
     )
-    metrics_df = mod04.compute_trigger_metrics(
+    metrics_df = trigger_metrics.compute_trigger_metrics(
         feature_df=feature_df,
         fps=fps_value,
         baseline_end_frame=baseline_end_frame,
@@ -418,7 +407,7 @@ def detect_trigger_on_smoothed_keypoints(
             )
 
             window_crossed_factors = []
-            for feature_name in mod04.BASE_FEATURE_COLUMNS:
+            for feature_name in trigger_metrics.BASE_FEATURE_COLUMNS:
                 if feature_name not in globally_crossed_factors:
                     continue
                 active_fraction = float(
@@ -483,7 +472,7 @@ def detect_trigger_on_smoothed_keypoints(
         "trigger_confidence": trigger_confidence,
         "trigger_decision_reason": trigger_decision_reason,
         "expected_trigger_frames": expected_trigger_frames,
-        "factors_evaluated": list(mod04.BASE_FEATURE_COLUMNS),
+        "factors_evaluated": list(trigger_metrics.BASE_FEATURE_COLUMNS),
         "factors_crossed": comparison["factors_crossed"],
         "crossed_factor_count": len(comparison["factors_crossed"]),
         "trigger_window_factors_crossed": best_window_crossed_factors if trigger_detected else [],

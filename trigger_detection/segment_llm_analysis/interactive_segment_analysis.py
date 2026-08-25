@@ -1,65 +1,48 @@
 #!/usr/bin/env python3
 """Interactive segment-level LLM batting analysis runner."""
 
-import importlib.util
 import json
 import os
 import sys
-import time
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import cv2
 import pandas as pd
-import requests
 
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-TRIGGER_DIR = Path(__file__).resolve().parent
-OUTPUT_DIR = REPO_ROOT / "trigger_detection_outputs" / "llm_segment_analysis"
-MD_DIR = TRIGGER_DIR / "md"
-ANNOTATED_DIR = REPO_ROOT / "annotated_videos_output"
-RESULT_SOURCE_PATH = TRIGGER_DIR / "data" / "segment_manifest.csv"
+PACKAGE_PARENT = Path(__file__).resolve().parents[2]
+if str(PACKAGE_PARENT) not in sys.path:
+    sys.path.insert(0, str(PACKAGE_PARENT))
+
+from trigger_detection.common.json_utils import json_ready, write_json
+from trigger_detection.common.llm_client import DEFAULT_MODEL, call_gemini
+from trigger_detection.config import (
+    ANNOTATED_VIDEO_DIR,
+    MD_DIR,
+    REPO_ROOT,
+    SEGMENT_LLM_OUTPUT_ROOT,
+    SEGMENT_MANIFEST_PATH,
+)
+from trigger_detection.segment_llm_analysis import feature_payload as llm_payload
+from trigger_detection.trigger_core import detect_trigger_window as td01
+from trigger_detection.trigger_core import feature_extraction as trigger_features
+
 
 API_KEY = os.getenv("GEMINI_API_KEY", "")
-API_URL_TEMPLATE = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-MODEL = "gemini-3.7-flash"
-
+MODEL = DEFAULT_MODEL
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-def _load_local_module(module_name: str, filename: str):
-    module_path = TRIGGER_DIR / filename
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Unable to load module from {module_path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-td01 = _load_local_module("td01_llm_runner", "03_detect_trigger_window.py")
-llm_payload = _load_local_module("td07_llm_runner", "07_llm_feature_payload.py")
-
-
-def _json_ready(value):
-    if isinstance(value, dict):
-        return {k: _json_ready(v) for k, v in value.items()}
-    if isinstance(value, list):
-        return [_json_ready(v) for v in value]
-    if pd.isna(value):
-        return None
-    return value
-
 
 def get_result_source() -> Path:
-    if not RESULT_SOURCE_PATH.exists():
-        raise FileNotFoundError(f"Required result source not found: {RESULT_SOURCE_PATH}")
-    sample_df = pd.read_csv(RESULT_SOURCE_PATH, nrows=1)
+    if not SEGMENT_MANIFEST_PATH.exists():
+        raise FileNotFoundError(f"Required result source not found: {SEGMENT_MANIFEST_PATH}")
+    sample_df = pd.read_csv(SEGMENT_MANIFEST_PATH, nrows=1)
     required = {"video_name", "ball", "segment_id", "trigger_detected"}
     if not required.issubset(set(sample_df.columns)):
-        raise ValueError(f"Result source is missing required columns: {RESULT_SOURCE_PATH}")
-    return RESULT_SOURCE_PATH
+        raise ValueError(f"Result source is missing required columns: {SEGMENT_MANIFEST_PATH}")
+    return SEGMENT_MANIFEST_PATH
 
 
 def load_processed_rows(source_path: Path) -> pd.DataFrame:
@@ -98,7 +81,7 @@ def choose_processed_segment(results_df: pd.DataFrame) -> pd.Series:
 def annotated_video_path(video_name: str, ball: int) -> Path:
     stem = video_name.replace(".mp4", "")
     prefix = stem.rsplit("_", 1)[0]
-    return ANNOTATED_DIR / f"{prefix}_ball{int(ball)}.mp4"
+    return ANNOTATED_VIDEO_DIR / f"{prefix}_ball{int(ball)}.mp4"
 
 
 def read_video_props(video_path: Path) -> tuple[float, Optional[int]]:
@@ -200,19 +183,19 @@ def build_prompt(
 
 ## Segment Metadata
 
-{json.dumps(_json_ready(metadata), indent=2)}
+{json.dumps(json_ready(metadata), indent=2)}
 
 ## Smoothed Keypoints JSON
 
-{json.dumps(_json_ready(smoothed_keypoints), indent=2)}
+{json.dumps(json_ready(smoothed_keypoints), indent=2)}
 
 ## All Features JSON
 
-{json.dumps(_json_ready(all_features), indent=2)}
+{json.dumps(json_ready(all_features), indent=2)}
 
 ## Feature Statistics JSON
 
-{json.dumps(_json_ready(feature_statistics), indent=2)}
+{json.dumps(json_ready(feature_statistics), indent=2)}
 
 ## MD2 Feature Calculation Rules
 
@@ -241,57 +224,6 @@ def build_prompt(
 - If no strong correction is needed, provide a basic style-preserving coaching cue instead of leaving the array empty.
 - If no strong injury concern is visible, provide one cautious "no strong visible concern identified" entry instead of leaving the array empty.
 """
-
-
-def call_llm(prompt: str, api_key: str, model: str = MODEL, max_attempts: int = 6) -> str:
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.15,
-            "maxOutputTokens": 12000,
-            "responseMimeType": "application/json",
-        },
-    }
-    last_error: Optional[str] = None
-    url = API_URL_TEMPLATE.format(model=model)
-
-    for attempt in range(1, max_attempts + 1):
-        try:
-            response = requests.post(
-                f"{url}?key={api_key}",
-                headers={"Content-Type": "application/json"},
-                json=payload,
-                timeout=180,
-            )
-            response_data = response.json()
-        except Exception as exc:
-            last_error = f"{type(exc).__name__}: {exc}"
-            response = None
-            response_data = {}
-        else:
-            if response.status_code == 200:
-                candidate = (response_data.get("candidates") or [{}])[0]
-                content = candidate.get("content") or {}
-                parts = content.get("parts") or []
-                texts = [part.get("text", "") for part in parts if isinstance(part, dict)]
-                joined = "\n".join(text.strip() for text in texts if text and text.strip()).strip()
-                finish_reason = candidate.get("finishReason")
-                if joined:
-                    return joined
-                last_error = f"Empty content with finishReason={finish_reason}"
-            else:
-                error = response_data.get("error", {})
-                last_error = (
-                    f"HTTP {response.status_code}: "
-                    f"{error.get('status', 'UNKNOWN')} - {error.get('message', 'No message')}"
-                )
-                if response.status_code not in {429, 500, 503}:
-                    break
-
-        if attempt < max_attempts:
-            time.sleep(min(2 ** (attempt - 1), 20))
-
-    raise RuntimeError(f"LLM call failed after {max_attempts} attempts. Last error: {last_error}")
 
 
 def main() -> int:
@@ -325,7 +257,7 @@ def main() -> int:
         stance_start_frame=stance_info["start_frame"],
         stance_end_frame=stance_info["end_frame"],
     )
-    trigger_feature_df = td01.mod03.compute_trigger_feature_dataframe(
+    trigger_feature_df = trigger_features.compute_trigger_feature_dataframe(
         bowler_keypoints_df=smoothed_df,
         start_frame=analysis_start_frame,
         end_frame=analysis_end_frame,
@@ -362,18 +294,18 @@ def main() -> int:
         },
     }
 
-    smoothed_records = _json_ready(smoothed_df.to_dict(orient="records"))
-    feature_records = _json_ready(all_feature_df.to_dict(orient="records"))
+    smoothed_records = json_ready(smoothed_df.to_dict(orient="records"))
+    feature_records = json_ready(all_feature_df.to_dict(orient="records"))
     docs = load_prompt_docs()
     prompt = build_prompt(docs, metadata, smoothed_records, feature_records, feature_statistics)
 
-    output_dir = OUTPUT_DIR / source_path.stem / f"{video_name.replace('.mp4', '')}_ball{ball}"
+    output_dir = SEGMENT_LLM_OUTPUT_ROOT / source_path.stem / f"{video_name.replace('.mp4', '')}_ball{ball}"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    (output_dir / "segment_metadata.json").write_text(json.dumps(_json_ready(metadata), indent=2), encoding="utf-8")
-    (output_dir / "smoothed_keypoints.json").write_text(json.dumps(smoothed_records, indent=2), encoding="utf-8")
-    (output_dir / "all_features.json").write_text(json.dumps(feature_records, indent=2), encoding="utf-8")
-    (output_dir / "feature_statistics.json").write_text(json.dumps(_json_ready(feature_statistics), indent=2), encoding="utf-8")
+    write_json(output_dir / "segment_metadata.json", metadata)
+    write_json(output_dir / "smoothed_keypoints.json", smoothed_records)
+    write_json(output_dir / "all_features.json", feature_records)
+    write_json(output_dir / "feature_statistics.json", feature_statistics)
     (output_dir / "llm_prompt.txt").write_text(prompt, encoding="utf-8")
 
     api_key = API_KEY
@@ -386,13 +318,21 @@ def main() -> int:
         return 0
 
     print(f"\nCalling LLM with model {MODEL}...")
-    response_text = call_llm(prompt, api_key, model=MODEL)
+    response_text = call_gemini(
+        prompt,
+        api_key,
+        model=MODEL,
+        temperature=0.15,
+        max_output_tokens=12000,
+        max_attempts=6,
+        timeout=180,
+    )
     (output_dir / "llm_analysis_raw.txt").write_text(response_text, encoding="utf-8")
 
     cleaned = response_text.replace("```json", "").replace("```", "").strip()
     try:
         parsed = json.loads(cleaned)
-        (output_dir / "llm_analysis.json").write_text(json.dumps(parsed, indent=2), encoding="utf-8")
+        write_json(output_dir / "llm_analysis.json", parsed)
         print("\nLLM analysis complete.")
         print(f"Saved JSON: {output_dir / 'llm_analysis.json'}")
     except json.JSONDecodeError:

@@ -4,27 +4,24 @@
 import json
 import os
 import sys
-import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, Dict, List
 
-import requests
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-TRIGGER_DIR = Path(__file__).resolve().parent
-MD_DIR = TRIGGER_DIR / "md"
-SEGMENT_SOURCE_DIR = (
-    REPO_ROOT
-    / "trigger_detection_outputs"
-    / "llm_segment_analysis"
-    / "segment_manifest"
-)
-OUTPUT_ROOT = REPO_ROOT / "trigger_detection_outputs" / "llm_player_analysis"
-MODEL = "gemini-3.7-flash"
-API_URL_TEMPLATE = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+PACKAGE_PARENT = Path(__file__).resolve().parents[2]
+if str(PACKAGE_PARENT) not in sys.path:
+    sys.path.insert(0, str(PACKAGE_PARENT))
+
+from trigger_detection.common.json_utils import read_json, write_json
+from trigger_detection.common.llm_client import DEFAULT_MODEL, build_gemini_request, call_gemini
+from trigger_detection.config import MD_DIR, PLAYER_LLM_OUTPUT_ROOT, REPO_ROOT, SEGMENT_LLM_OUTPUT_ROOT
+
+
+SEGMENT_SOURCE_DIR = SEGMENT_LLM_OUTPUT_ROOT / "segment_manifest"
+OUTPUT_ROOT = PLAYER_LLM_OUTPUT_ROOT
+MODEL = DEFAULT_MODEL
 API_KEY = os.getenv("GEMINI_API_KEY", "")
-
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
@@ -49,7 +46,7 @@ def _collect_md_bundle() -> str:
 
 
 def _load_segment_json(path: Path) -> Dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return read_json(path)
 
 
 def _player_name_for_video(video_name: str) -> str:
@@ -109,15 +106,12 @@ def _build_prompt(player_input: Dict[str, Any], md_bundle: str) -> str:
 
 
 def _build_llm_request_json(prompt: str) -> Dict[str, Any]:
-    return {
-        "contents": [{"role": "user", "parts": [{"text": prompt}]}],
-        "generationConfig": {
-            "temperature": 0.2,
-            "topP": 0.95,
-            "maxOutputTokens": 8192,
-            "responseMimeType": "application/json",
-        },
-    }
+    return build_gemini_request(
+        prompt,
+        temperature=0.2,
+        top_p=0.95,
+        max_output_tokens=8192,
+    )
 
 
 def choose_player(packets_by_player: Dict[str, List[Dict[str, Any]]]) -> str:
@@ -135,34 +129,6 @@ def choose_player(packets_by_player: Dict[str, List[Dict[str, Any]]]) -> str:
         print("Please enter a valid player index from the list above.")
 
 
-def _call_gemini(prompt: str, api_key: str) -> str:
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY is not set.")
-    url = API_URL_TEMPLATE.format(model=MODEL)
-    payload = _build_llm_request_json(prompt)
-    last_error = None
-    for attempt in range(1, 7):
-        print(f"\nCalling Gemini model {MODEL} (attempt {attempt}/6)...", flush=True)
-        response = requests.post(url, params={"key": api_key}, json=payload, timeout=600)
-        if response.ok:
-            data = response.json()
-            candidates = data.get("candidates", [])
-            if candidates:
-                parts = candidates[0].get("content", {}).get("parts", [])
-                text = "".join(part.get("text", "") for part in parts if isinstance(part, dict))
-                if text.strip():
-                    print("Gemini response received.", flush=True)
-                    return text
-            raise RuntimeError(f"Unexpected Gemini response payload: {data}")
-        last_error = f"HTTP {response.status_code}: {response.text}"
-        if response.status_code in {429, 503} and attempt < 6:
-            print(f"Gemini returned a temporary error. Retrying soon...", flush=True)
-            time.sleep(min(8 * attempt, 30))
-            continue
-        raise RuntimeError(last_error)
-    raise RuntimeError(last_error or "Gemini call failed")
-
-
 def main() -> int:
     md_bundle = _collect_md_bundle()
     packets_by_player = _build_player_packets()
@@ -178,14 +144,8 @@ def main() -> int:
     player_input = _build_player_input(player_name, packets)
     prompt = _build_prompt(player_input, md_bundle)
     llm_request = _build_llm_request_json(prompt)
-    (player_dir / "player_input.json").write_text(
-        json.dumps(player_input, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
-    (player_dir / "player_llm_request.json").write_text(
-        json.dumps(llm_request, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
+    write_json(player_dir / "player_input.json", player_input)
+    write_json(player_dir / "player_llm_request.json", llm_request)
     print(f"\nPrepared prompt for {player_name} with {len(packets)} segment outputs.")
 
     api_key = API_KEY
@@ -205,7 +165,16 @@ def main() -> int:
 
     print("\nStarting player-level LLM analysis...", flush=True)
     try:
-        response_text = _call_gemini(prompt, api_key)
+        response_text = call_gemini(
+            prompt,
+            api_key,
+            model=MODEL,
+            temperature=0.2,
+            top_p=0.95,
+            max_output_tokens=8192,
+            max_attempts=6,
+            timeout=600,
+        )
     except RuntimeError as exc:
         print(f"\nLLM call failed: {exc}")
         print(f"Saved player input JSON: {player_dir / 'player_input.json'}")
@@ -215,10 +184,7 @@ def main() -> int:
     (player_dir / "player_llm_analysis_raw.txt").write_text(response_text, encoding="utf-8")
     try:
         parsed = json.loads(response_text)
-        (player_dir / "player_llm_analysis.json").write_text(
-            json.dumps(parsed, indent=2, ensure_ascii=False),
-            encoding="utf-8",
-        )
+        write_json(player_dir / "player_llm_analysis.json", parsed)
         print(f"saved {player_dir / 'player_llm_analysis.json'}")
     except json.JSONDecodeError:
         (player_dir / "player_llm_analysis_error.txt").write_text(

@@ -8,11 +8,11 @@ from typing import List, Optional, Tuple
 
 import pandas as pd
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[2]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from trigger_detection.gcp_fetch_utils import GCSClient
+from trigger_detection.common.gcp_fetch_utils import GCSClient
 
 
 def gcloud_executable() -> str:

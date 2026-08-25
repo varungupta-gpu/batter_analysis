@@ -1,28 +1,13 @@
 import json
-import importlib.util
-from pathlib import Path
 from typing import Dict, List
 
 import numpy as np
 import pandas as pd
 
-
-MODULE_DIR = Path(__file__).resolve().parent
-
-
-def _load_local_module(module_name: str, filename: str):
-    module_path = MODULE_DIR / filename
-    spec = importlib.util.spec_from_file_location(module_name, module_path)
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Unable to load module from {module_path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
-trigger_features = _load_local_module("td03_llm", "04_feature_extraction.py")
-trigger_metrics = _load_local_module("td04_llm", "05_compute_trigger_metrics.py")
-phase_features = _load_local_module("td06_llm", "06_phase_feature_calculations.py")
+from trigger_detection.common.json_utils import json_ready
+from trigger_detection.trigger_core import compute_trigger_metrics as trigger_metrics
+from trigger_detection.trigger_core import feature_extraction as trigger_features
+from trigger_detection.trigger_core import phase_feature_calculations as phase_features
 
 
 ALL_FEATURE_COLUMNS = [
@@ -99,20 +84,6 @@ def _series_summary(series: pd.Series) -> Dict[str, float]:
         "end_value": float(clean.iloc[-1]),
         "delta": float(clean.iloc[-1] - clean.iloc[0]),
     }
-
-
-def _json_ready(value):
-    if isinstance(value, dict):
-        return {k: _json_ready(v) for k, v in value.items()}
-    if isinstance(value, list):
-        return [_json_ready(v) for v in value]
-    if isinstance(value, (np.integer,)):
-        return int(value)
-    if isinstance(value, (np.floating, float)):
-        return None if not np.isfinite(value) else float(value)
-    if pd.isna(value):
-        return None
-    return value
 
 
 def compute_all_feature_dataframe(
@@ -194,16 +165,16 @@ def compute_feature_statistics(
         summaries[column] = _series_summary(all_feature_df[column])
         series = pd.to_numeric(all_feature_df[column], errors="coerce")
         rolling_stats[column] = {
-            "rolling_mean": _json_ready(series.rolling(window=rolling_window, min_periods=1).mean().tolist()),
-            "rolling_std": _json_ready(series.rolling(window=rolling_window, min_periods=2).std().fillna(0.0).tolist()),
-            "rolling_variance": _json_ready(series.rolling(window=rolling_window, min_periods=2).var().fillna(0.0).tolist()),
-            "rolling_range": _json_ready(
+            "rolling_mean": json_ready(series.rolling(window=rolling_window, min_periods=1).mean().tolist()),
+            "rolling_std": json_ready(series.rolling(window=rolling_window, min_periods=2).std().fillna(0.0).tolist()),
+            "rolling_variance": json_ready(series.rolling(window=rolling_window, min_periods=2).var().fillna(0.0).tolist()),
+            "rolling_range": json_ready(
                 (
                     series.rolling(window=rolling_window, min_periods=2).max()
                     - series.rolling(window=rolling_window, min_periods=2).min()
                 ).fillna(0.0).tolist()
             ),
-            "rolling_mad": _json_ready(
+            "rolling_mad": json_ready(
                 series.rolling(window=rolling_window, min_periods=2).apply(_safe_mad, raw=False).fillna(0.0).tolist()
             ),
         }
@@ -215,7 +186,7 @@ def compute_feature_statistics(
         min_active_features=4,
     )
 
-    return _json_ready(
+    return json_ready(
         {
             "rolling_window": rolling_window,
             "feature_columns": ALL_FEATURE_COLUMNS,

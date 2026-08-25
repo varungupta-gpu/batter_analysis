@@ -1,139 +1,122 @@
 # Batter Trigger Analysis
 
-This repository contains the trigger-focused batting workflow only: batsman keypoint fetching/downloading, trigger detection, segment-level LLM analysis, and player-level LLM analysis.
+This repo contains the curated batting trigger workflow: batsman keypoint download, trigger detection, segment-level LLM analysis, and player-level LLM analysis.
 
-Generated LLM outputs are intentionally not committed.
+Generated videos and LLM outputs are not committed. The repo keeps only the code, prompt markdown, manifest CSV, selected batsman keypoint CSVs, and `segment.xlsx`.
 
-## What is included
+## Install
 
-- Renumbered trigger scripts inside `trigger_detection/`
-- All prompt and knowledge markdown files inside `trigger_detection/md/`
-- One consolidated manifest CSV: `trigger_detection/data/segment_manifest.csv`
-- Batsman keypoint CSV files for the 43 curated segments inside `trigger_detection/data/batsman_keypoints/`
-- `segment.xlsx`
+```powershell
+cd "C:\Users\raksh\OneDrive\Desktop\batter_analysis"
+pip install -r requirements.txt
+```
 
-## Major files
+## Folder Structure
 
-### Entry-point scripts
+- `trigger_detection/trigger_core/`
+  Contains only trigger detection and feature-calculation logic.
 
-- `trigger_detection/01_fetch_batsman_keypoints.py`
-  Use this when you want to trigger or fetch upstream batsman-keypoint generation jobs for selected videos and segments.
+- `trigger_detection/segment_llm_analysis/`
+  Contains the interactive segment-level LLM runner and the feature-payload builder used by that runner.
 
-- `trigger_detection/02_download_batsman_keypoints.py`
-  Use this to download batsman keypoint CSV files from GCS after upstream jobs have completed.
+- `trigger_detection/player_llm_analysis/`
+  Contains the interactive player-level LLM runner. It reads completed segment-level JSON outputs and combines them into one batter report.
 
-- `trigger_detection/08_interactive_llm_segment_analysis.py`
-  Main interactive runner for segment-level analysis. This is the script most users will run first inside this repo.
+- `trigger_detection/keypoint_download/`
+  Contains helper entry points for triggering/downloading batsman keypoints from upstream services.
 
-- `trigger_detection/09_interactive_llm_player_analysis.py`
-  Main interactive runner for player-level analysis. This should be run only after segment-level LLM outputs exist.
+- `trigger_detection/common/`
+  Contains reusable non-workflow helpers such as Gemini API calls, JSON serialization, GCS helpers, and keypoint normalization helpers.
 
-### Core trigger-analysis modules
-
-- `trigger_detection/03_detect_trigger_window.py`
-  Core trigger detector. It smooths batsman keypoints, defines the stance/trigger window, and prepares the frame range used for analysis.
-
-- `trigger_detection/04_feature_extraction.py`
-  Computes the original trigger features frame by frame, such as foot progression, ankle displacement, stride width, and knee movement.
-
-- `trigger_detection/05_compute_trigger_metrics.py`
-  Converts extracted features into trigger metrics used for trigger scoring and downstream interpretation.
-
-- `trigger_detection/06_phase_feature_calculations.py`
-  Computes the extended body-organisation and biomechanics-style features such as hip direction, rotation, trunk flexion, and knee angles.
-
-- `trigger_detection/07_llm_feature_payload.py`
-  Builds the structured feature package used by the segment LLM step. It combines original trigger features, extended phase features, rolling statistics, and summary values into one LLM-ready payload.
-
-### Shared helpers
-
-- `trigger_detection/phase_pipeline_common.py`
-  Shared utility layer for loading and normalising keypoints/release data, inferring standard columns, and handling common geometry helpers.
-
-- `trigger_detection/gcp_fetch_utils.py`
-  Shared Google Cloud / API helper functions used by the fetch and download scripts.
-
-### Data and prompts
-
-- `trigger_detection/data/segment_manifest.csv`
-  The single source CSV used by the trigger workflow in this repo. It contains video id, video name, ball, segment id, release frame, trigger metadata, and the local batsman keypoint CSV path.
-
-- `trigger_detection/data/batsman_keypoints/`
-  Contains the local batsman keypoint CSV files referenced by the manifest.
+- `trigger_detection/config.py`
+  Central path/config module. Keep project paths here, not inside `common`.
 
 - `trigger_detection/md/`
-  Contains all prompt and knowledge markdown files used by the LLM analysis scripts.
+  Contains all markdown prompt/knowledge files used by the LLM analysis.
 
-## Prompt files
+- `trigger_detection/data/segment_manifest.csv`
+  The single curated CSV used by this repo. It includes video name, ball, segment id, release frame, trigger prediction fields, and local batsman keypoint paths.
 
-All markdown files inside `trigger_detection/md/` are included.
+- `trigger_detection/data/batsman_keypoints/`
+  Local batsman keypoint CSV files used by the manifest rows.
 
-Important ones are:
+## Main File Flow
 
-- `MD1_Segment_Level_Stance_Trigger_Analysis_Prompt (1).md`
-  Main segment-level analysis prompt.
+1. `trigger_detection/keypoint_download/fetch_batsman_keypoints.py`
+   Optional upstream job trigger for batsman pose/keypoint generation.
 
-- `MD2_Keypoints_and_Feature_Calculation.md`
-  Feature-definition and calculation reference used in the segment workflow.
+2. `trigger_detection/keypoint_download/download_batsman_keypoints.py`
+   Optional GCS downloader for generated `batter_keypoints.csv` files.
 
-- `MD3_Stance_and_Trigger_Classification.md`
-  Stance and trigger classification knowledge source.
+3. `trigger_detection/trigger_core/detect_trigger_window.py`
+   Runs trigger detection on smoothed batsman keypoints. It compares pre-load-up motion against load-up-to-release motion and outputs trigger frames/metrics.
 
-- `MD4_Trigger_Corrections_and_Biomechanical_Concerns.md`
-  Correction and biomechanical-concern guidance.
+4. `trigger_detection/segment_llm_analysis/feature_payload.py`
+   Builds the LLM-ready feature payload. It combines original trigger features, extended phase/biomechanics features, rolling stats, summary stats, and trigger metric frames.
 
-- `Player_Level_Combined_Stance_Trigger_Prompt (1).md`
-  Main player-level aggregation prompt.
+5. `trigger_detection/segment_llm_analysis/interactive_segment_analysis.py`
+   Interactive segment-level analysis. It asks which processed segment to analyze, prepares JSON inputs, optionally asks for a Gemini API key, and saves the segment report.
 
-## Workflow
+6. `trigger_detection/player_llm_analysis/interactive_player_analysis.py`
+   Interactive player-level analysis. It asks which player to analyze, groups existing segment reports using the current rule, prepares JSON input, optionally asks for a Gemini API key, and saves the player report.
 
-### 1. Fetch or download batsman keypoints
-
-If batsman keypoints do not already exist:
-
-- run `01_fetch_batsman_keypoints.py` to trigger/fetch upstream jobs
-- run `02_download_batsman_keypoints.py` to download the keypoint CSV files
-
-For the curated set in this repository, the required batsman keypoint CSV files are already included.
-
-### 2. Run segment-level LLM analysis
-
-Run:
+## Run Segment-Level Analysis
 
 ```powershell
-python trigger_detection\08_interactive_llm_segment_analysis.py
+cd "C:\Users\raksh\OneDrive\Desktop\batter_analysis"
+python trigger_detection\segment_llm_analysis\interactive_segment_analysis.py
 ```
 
-This script:
+This uses:
 
-- reads `trigger_detection/data/segment_manifest.csv`
-- lets you choose a segment interactively
-- smooths batsman keypoints
-- computes trigger and phase features
-- builds the segment prompt using the markdown files
-- optionally calls Gemini
-- saves generated outputs under `trigger_detection_outputs/llm_segment_analysis/segment_manifest/`
+- `trigger_detection/data/segment_manifest.csv`
+- `trigger_detection/data/batsman_keypoints/`
+- `trigger_detection/md/MD1_Segment_Level_Stance_Trigger_Analysis_Prompt (1).md`
+- `trigger_detection/md/MD2_Keypoints_and_Feature_Calculation.md`
+- `trigger_detection/md/MD3_Stance_and_Trigger_Classification.md`
+- `trigger_detection/md/MD4_Trigger_Corrections_and_Biomechanical_Concerns.md`
 
-### 3. Run player-level LLM analysis
+Outputs are written to:
 
-Run:
+```text
+trigger_detection_outputs/llm_segment_analysis/segment_manifest/
+```
+
+If no trigger exists in the source row, the segment runner passes `release_frame - 20` through `release_frame - 12` as fallback trigger frames so the LLM can still judge whether that movement is a real trigger.
+
+## Run Player-Level Analysis
+
+Run this after segment-level `llm_analysis.json` files exist:
 
 ```powershell
-python trigger_detection\09_interactive_llm_player_analysis.py
+cd "C:\Users\raksh\OneDrive\Desktop\batter_analysis"
+python trigger_detection\player_llm_analysis\interactive_player_analysis.py
 ```
 
-This script:
+This uses:
 
-- reads the generated segment-level LLM outputs
-- groups players using the current project rule:
-  videos starting with `f` -> `player1`
-  all others -> `player2`
-- builds a player-level JSON input
-- optionally calls Gemini
-- saves generated outputs under `trigger_detection_outputs/llm_player_analysis/`
+- existing segment JSON outputs from `trigger_detection_outputs/llm_segment_analysis/segment_manifest/`
+- `trigger_detection/md/MD3_Stance_and_Trigger_Classification.md`
+- `trigger_detection/md/MD4_Trigger_Corrections_and_Biomechanical_Concerns.md`
+- `trigger_detection/md/Player_Level_Combined_Stance_Trigger_Prompt (1).md`
 
-## Notes
+Current player grouping rule:
 
-- `trigger_detection_outputs/` is gitignored because it contains generated outputs.
-- This repository uses one consolidated manifest CSV instead of many intermediate CSV files.
-- Player-level analysis depends on segment-level LLM outputs being created first.
+- video names starting with `f` become `player1`
+- all other video names become `player2`
+
+Outputs are written to:
+
+```text
+trigger_detection_outputs/llm_player_analysis/
+```
+
+## Design Notes
+
+- Single Responsibility: trigger detection, segment LLM analysis, player LLM analysis, config, JSON helpers, and API calls are separated into different modules.
+
+- DRY: shared Gemini request logic lives in `trigger_detection/common/llm_client.py`, and JSON cleanup/writing lives in `trigger_detection/common/json_utils.py`.
+
+- Encapsulation: each workflow folder imports stable helpers instead of loading numbered scripts dynamically.
+
+- Config location: project paths are centralized in `trigger_detection/config.py` as requested.
