@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 import numpy as np
 import pandas as pd
 
-from phase_pipeline_common import (
+from trigger_detection.phase_pipeline_common import (
     build_release_info_from_frame,
     load_json_or_csv,
     load_keypoints_csv,

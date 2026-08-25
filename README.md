@@ -47,10 +47,10 @@ Generated LLM outputs are intentionally not committed.
 
 ### Shared helpers
 
-- `phase_pipeline_common.py`
+- `trigger_detection/phase_pipeline_common.py`
   Shared utility layer for loading and normalising keypoints/release data, inferring standard columns, and handling common geometry helpers.
 
-- `gcp_fetch_utils.py`
+- `trigger_detection/gcp_fetch_utils.py`
   Shared Google Cloud / API helper functions used by the fetch and download scripts.
 
 ### Data and prompts
