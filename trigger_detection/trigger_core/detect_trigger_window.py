@@ -34,7 +34,6 @@ LOADUP_TO_RELEASE_FRAMES = 27
 PRE_LOADUP_WINDOW_FRAMES = 27
 MIN_PRE_LOADUP_FRAMES = 1
 MIN_ACTIVE_FEATURES = 4
-MIN_ANKLE_ACTIVE_FEATURES = 3.5
 MIN_WINDOW_CONFIDENCE = 2.8
 MIN_FACTOR_MOVEMENT_RATIO = 1.4
 MIN_FACTOR_ACTIVE_FRACTION = 0.65
@@ -82,13 +81,6 @@ def _window_score(window_df: pd.DataFrame, metric_columns: List[str]) -> float:
         ).fillna(0).mean()
     )
     score += active_features * 0.75
-    ankle_active_features = int(
-        pd.to_numeric(
-            window_df.get("ankle_active_feature_count", pd.Series(dtype=float)),
-            errors="coerce",
-        ).fillna(0).mean()
-    )
-    score += ankle_active_features * 1.5
     return score
 
 
@@ -393,12 +385,6 @@ def detect_trigger_on_smoothed_keypoints(
             trigger_confidence = float(
                 pd.to_numeric(window_df["window_confidence"], errors="coerce").mean()
             )
-            mean_ankle_active = float(
-                pd.to_numeric(
-                    window_df.get("ankle_active_feature_count", pd.Series(dtype=float)),
-                    errors="coerce",
-                ).fillna(0).mean()
-            )
             mean_active = float(
                 pd.to_numeric(
                     window_df.get("active_feature_count", pd.Series(dtype=float)),
@@ -421,7 +407,6 @@ def detect_trigger_on_smoothed_keypoints(
 
             if (
                 trigger_confidence < MIN_WINDOW_CONFIDENCE
-                or mean_ankle_active < MIN_ANKLE_ACTIVE_FEATURES
                 or mean_active < MIN_ACTIVE_FEATURES
                 or len(window_crossed_factors) < MIN_CROSSED_FACTORS
             ):
@@ -538,7 +523,6 @@ def main() -> None:
             "release_frame": int(round(release_frame)),
             "smooth_window": SMOOTH_WINDOW,
             "min_active_features": MIN_ACTIVE_FEATURES,
-            "min_ankle_active_features": MIN_ANKLE_ACTIVE_FEATURES,
             "min_window_confidence": MIN_WINDOW_CONFIDENCE,
             "min_factor_movement_ratio": MIN_FACTOR_MOVEMENT_RATIO,
             "min_factor_active_fraction": MIN_FACTOR_ACTIVE_FRACTION,

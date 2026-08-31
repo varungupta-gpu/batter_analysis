@@ -15,17 +15,6 @@ BASE_FEATURE_COLUMNS = [
     "knee_to_knee_distance",
 ]
 
-ANKLE_DOMINANT_FEATURE_COLUMNS = [
-    "front_foot_progression",
-    "back_foot_progression",
-    "front_ankle_displacement",
-    "back_ankle_displacement",
-    "stride_width",
-    "front_knee_displacement",
-    "back_knee_displacement",
-    "knee_to_knee_distance",
-]
-
 FEATURE_WEIGHTS = {
     "front_foot_progression": 2.4,
     "back_foot_progression": 2.2,
@@ -83,7 +72,6 @@ def compute_trigger_metrics(
     active_flag_columns: List[str] = []
     confidence_columns: List[str] = []
     computed_columns: Dict[str, pd.Series] = {}
-    ankle_flag_columns: List[str] = []
 
     for feature_name in BASE_FEATURE_COLUMNS:
         weight = FEATURE_WEIGHTS.get(feature_name, 1.0)
@@ -136,8 +124,6 @@ def compute_trigger_metrics(
         computed_columns[f"{feature_name}_movement_flag"] = movement_flag
 
         active_flag_columns.append(f"{feature_name}_movement_flag")
-        if feature_name in ANKLE_DOMINANT_FEATURE_COLUMNS:
-            ankle_flag_columns.append(f"{feature_name}_movement_flag")
         confidence_column = f"{feature_name}_confidence"
         computed_columns[confidence_column] = (
             baseline_change_strength
@@ -151,14 +137,9 @@ def compute_trigger_metrics(
 
     metrics_df = pd.concat([metrics_df, pd.DataFrame(computed_columns, index=metrics_df.index)], axis=1)
     metrics_df["active_feature_count"] = metrics_df[active_flag_columns].sum(axis=1)
-    if ankle_flag_columns:
-        metrics_df["ankle_active_feature_count"] = metrics_df[ankle_flag_columns].sum(axis=1)
-    else:
-        metrics_df["ankle_active_feature_count"] = 0
     metrics_df["window_confidence"] = metrics_df[confidence_columns].mean(axis=1)
     metrics_df["movement_flag"] = (
         (metrics_df["active_feature_count"] >= min_active_features)
-        & (metrics_df["ankle_active_feature_count"] >= 3)
         & (metrics_df["window_confidence"] >= 2.5)
     ).astype(int)
 
