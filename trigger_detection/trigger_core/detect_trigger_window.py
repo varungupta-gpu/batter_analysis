@@ -427,11 +427,15 @@ def detect_trigger_on_smoothed_keypoints(
         )
         expected_trigger_frames = [int(frame) for frame in best_window["frame"].tolist()]
         trigger_decision_reason = "actual_trigger"
+        stance_start_frame = baseline_start_frame
+        stance_end_frame = max(loadup_start_frame, trigger_start - 1)
     else:
         trigger_start = None
         trigger_end = None
         trigger_confidence = 0.0
         expected_trigger_frames = []
+        stance_start_frame = baseline_start_frame
+        stance_end_frame = release_frame_int
         if len(globally_crossed_factors) < MIN_CROSSED_FACTORS:
             trigger_decision_reason = "insufficient_factor_change_vs_preload"
         else:
@@ -450,6 +454,8 @@ def detect_trigger_on_smoothed_keypoints(
         "baseline_source": baseline_source,
         "baseline_start_frame": baseline_start_frame,
         "baseline_end_frame": baseline_end_frame,
+        "stance_start_frame": stance_start_frame,
+        "stance_end_frame": stance_end_frame,
         "release_frame": release_frame_int,
         "trigger_detected": trigger_detected,
         "trigger_start_frame": trigger_start,
@@ -540,6 +546,8 @@ def main() -> None:
             "baseline_source": "",
             "baseline_start_frame": "",
             "baseline_end_frame": "",
+            "stance_start_frame": "",
+            "stance_end_frame": "",
             "trigger_detected": False,
             "trigger_start_frame": "",
             "trigger_end_frame": "",
@@ -589,6 +597,8 @@ def main() -> None:
                     "baseline_source": trigger_result["baseline_source"],
                     "baseline_start_frame": trigger_result["baseline_start_frame"],
                     "baseline_end_frame": trigger_result["baseline_end_frame"],
+                    "stance_start_frame": trigger_result["stance_start_frame"],
+                    "stance_end_frame": trigger_result["stance_end_frame"],
                     "trigger_detected": bool(trigger_result["trigger_detected"]),
                     "trigger_start_frame": trigger_result["trigger_start_frame"],
                     "trigger_end_frame": trigger_result["trigger_end_frame"],
@@ -653,7 +663,15 @@ def main() -> None:
     FEATURE_METRICS_JSON.write_text(json.dumps(feature_metrics_payload, indent=2), encoding="utf-8")
 
     summary_df = detailed_df[
-        ["video_name", "ball", "segment_id", "expected_trigger_frames", "trigger_detected"]
+        [
+            "video_name",
+            "ball",
+            "segment_id",
+            "stance_start_frame",
+            "stance_end_frame",
+            "expected_trigger_frames",
+            "trigger_detected",
+        ]
     ].rename(columns={"expected_trigger_frames": "trigger_frames"})
     summary_output_path = _write_csv_with_locked_fallback(summary_df, SUMMARY_OUTPUT_CSV)
 
