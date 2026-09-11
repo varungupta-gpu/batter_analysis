@@ -1,0 +1,1042 @@
+{
+  "model_type": "DeepBidirectionalGRU",
+  "num_classes": 4,
+  "classes": [
+    "preparation",
+    "downswing",
+    "followthrough",
+    "no_phase"
+  ],
+  "feature_names": [
+    "ankle_speed_max",
+    "arm_activity_score",
+    "back_knee_angle",
+    "bat_arm_elbow_angle",
+    "bat_arm_elbow_speed",
+    "bat_arm_extension",
+    "bat_arm_wrist_speed",
+    "body_center_speed",
+    "body_center_x",
+    "body_center_y",
+    "ear_separation",
+    "elbow_speed_max",
+    "eye_separation",
+    "front_knee_angle",
+    "head_movement",
+    "head_orientation_angle",
+    "head_speed",
+    "hip_line_angle",
+    "hip_shoulder_separation",
+    "hip_speed_max",
+    "impact_like_frame_flag",
+    "knee_speed_max",
+    "left_ankle_speed",
+    "left_arm_length",
+    "left_ear_speed",
+    "left_elbow_angle",
+    "left_elbow_joint_angle",
+    "left_elbow_speed",
+    "left_eye_speed",
+    "left_forearm_length",
+    "left_hip_speed",
+    "left_knee_angle",
+    "left_knee_speed",
+    "left_shoulder_speed",
+    "left_shoulder_wrist_dist",
+    "left_wrist_height_rel",
+    "left_wrist_speed",
+    "lower_body_rotation",
+    "pose_activity_score",
+    "right_ankle_speed",
+    "right_arm_length",
+    "right_ear_speed",
+    "right_elbow_angle",
+    "right_elbow_joint_angle",
+    "right_elbow_speed",
+    "right_eye_speed",
+    "right_forearm_length",
+    "right_hip_speed",
+    "right_knee_angle",
+    "right_knee_speed",
+    "right_shoulder_speed",
+    "right_shoulder_wrist_dist",
+    "right_wrist_height_rel",
+    "right_wrist_speed",
+    "shoulder_line_angle",
+    "shoulder_rotation_change",
+    "shoulder_speed_max",
+    "trunk_lean",
+    "upper_body_rotation",
+    "wrist_height_change",
+    "wrist_speed_max"
+  ],
+  "sequence_length": 80,
+  "hidden_dims": [
+    64,
+    128,
+    256
+  ],
+  "dropout": 0.3,
+  "batch_size": 8,
+  "num_epochs": 100,
+  "learning_rate": 0.0005,
+  "test_size": 0.15,
+  "best_val_loss": 0.6779040992259979,
+  "train_videos": [
+    "4af4f6b5-b557-4bf1-9cb5-76fc669915e8_delivery_15",
+    "camera2_clip_20260528_123150_12473",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_30",
+    "9d43c8ca-67d4-49a5-b3ca-7930ad933230_delivery_3",
+    "d0af424c-4a9e-4411-b2c2-05526f9e2f7f_delivery_17",
+    "8c22159b-91b8-48b9-9696-ce3925b7a484_delivery_1",
+    "camera2_clip_20260408_192238_174043",
+    "camera2_clip_20260524_093937_47384",
+    "4cf07982-ddd4-4196-bcde-ae1f618e1dba_delivery_16",
+    "camera2_clip_20260604_162209_5829",
+    "camera2_clip_20260531_161804_1160",
+    "00e39b89-84a3-4095-b669-719634933843_delivery_22",
+    "camera2_clip_20260608_182314_91546",
+    "970a5984-8294-4ed3-9a12-c76d7a27f97f_delivery_2",
+    "camera2_clip_20260524_093938_62712",
+    "camera2_clip_20260604_162209_31061",
+    "22a76ae6-8845-4c11-9024-87a931a562d4_delivery_2",
+    "2d36b9ce-c540-4fce-afae-1320568ec687_delivery_7",
+    "c84b9ad5-2640-4fe2-b9b8-0145d58c17f9_delivery_2",
+    "8a5a45f1-f089-4401-9911-ceb005ec8671_delivery_1",
+    "1422e687-d176-44a4-819e-2c10a141a682_delivery_3",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_3",
+    "b2a503a6-a533-4248-8f91-0f3278df91df_delivery_1",
+    "1bb571ba-dc23-4fcb-9e77-70746e566ce1_delivery_2",
+    "f241dac4-644d-47f1-9b40-58f3adbeb395_delivery_3",
+    "camera2_clip_20260529_170016_1433",
+    "479038b4-6281-4885-99d9-236a1dbf8b4e_delivery_1",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_6",
+    "9d43c8ca-67d4-49a5-b3ca-7930ad933230_delivery_2",
+    "178abe9f-dc3a-45ac-89c9-566dba61bce9_delivery_10",
+    "d0af424c-4a9e-4411-b2c2-05526f9e2f7f_delivery_22",
+    "9d43c8ca-67d4-49a5-b3ca-7930ad933230_delivery_9",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_32",
+    "camera2_clip_20260408_191227_91706",
+    "77417906-e1c4-4717-9419-5bf7bda6f076_delivery_1",
+    "camera2_clip_20260318_190437_278671",
+    "21c1f521-f220-4a6e-83aa-71ca085845bf_delivery_14",
+    "camera2_clip_20260601_184452_6964",
+    "camera2_clip_20260318_190437_156428",
+    "4af4f6b5-b557-4bf1-9cb5-76fc669915e8_delivery_1",
+    "008330cf-9d1e-41b5-8bcf-7a233788ad3a_delivery_1",
+    "camera2_clip_20260530_072726_46948",
+    "21c1f521-f220-4a6e-83aa-71ca085845bf_delivery_13",
+    "d62173bf-f836-4738-a7fb-22a64611af02_delivery_7",
+    "camera2_clip_20260601_174715_574949",
+    "multi_pose_delivery_15",
+    "d0af424c-4a9e-4411-b2c2-05526f9e2f7f_delivery_2",
+    "camera2_clip_20260601_155515_6106",
+    "camera2_clip_20260527_112309_4642",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_19",
+    "c205fd81-5a0b-458a-939f-c45fdfc8d6e5_delivery_2",
+    "3658b9c7-b70d-4cc4-af20-3b324ba0a954_delivery_11",
+    "ed7525a9-fbb6-4a21-bdbd-71bcf0d779f9_delivery_8",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_2",
+    "camera2_clip_20260609_183427_18983",
+    "c205fd81-5a0b-458a-939f-c45fdfc8d6e5_delivery_1",
+    "camera2_clip_20260614_182154_35444",
+    "camera2_clip_20260606_174905_16125",
+    "4cf6dde3-f462-4d7c-874f-cac17c62beaf_delivery_7",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_7",
+    "a3995f18-4d84-4167-bcb9-315280a79673_delivery_5",
+    "c44abd22-0712-47a2-9654-07fc4ac380bb_delivery_6",
+    "57611182-24f2-4793-9bb8-aa9687f4096b_delivery_1",
+    "camera2_clip_20260609_174330_7268",
+    "9d43c8ca-67d4-49a5-b3ca-7930ad933230_delivery_1",
+    "camera2_clip_20260601_090824_4131",
+    "6c4a2070-b534-47fc-ab1a-2ed0c8a6b73e_delivery_3",
+    "dbaac1cb-ecef-4650-a767-3c716a86af39_delivery_1",
+    "WhatsApp Video 2026-07-18 at 13.03.46",
+    "008330cf-9d1e-41b5-8bcf-7a233788ad3a_delivery_14",
+    "6a8973e9-f387-4afc-a16d-e5c5db2892ec_delivery_12",
+    "1422e687-d176-44a4-819e-2c10a141a682_delivery_2",
+    "008330cf-9d1e-41b5-8bcf-7a233788ad3a_delivery_5",
+    "camera2_clip_20260530_072246_48360",
+    "camera2_clip_20260408_192937_211753",
+    "5e2d3ff3-4182-41c2-9433-a775bde0e954_delivery_22",
+    "camera2_clip_20260602_155415_5174",
+    "1422e687-d176-44a4-819e-2c10a141a682_delivery_1",
+    "5e2d3ff3-4182-41c2-9433-a775bde0e954_delivery_23",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_24",
+    "camera2_clip_20260606_214146_28201",
+    "WhatsApp Video 2026-07-18 at 13.03.50",
+    "008330cf-9d1e-41b5-8bcf-7a233788ad3a_delivery_7",
+    "camera2_clip_20260531_093203_23097",
+    "camera2_clip_20260614_182155_117578",
+    "camera2_clip_20260318_200417_649384",
+    "4f1c3ef4-bef8-472e-87ff-a9a418067ac8_delivery_1",
+    "89364d92-73c7-42d3-8ab3-f3cac42cce44_delivery_7",
+    "b782f0fb-af7e-49aa-8dfa-ce8a8274e3eb_delivery_3",
+    "e0f3a7a0-f933-419b-844b-9e9b22f18db5_delivery_10",
+    "camera2_clip_20260308_162424_74335",
+    "camera2_clip_20260530_072726_24862",
+    "f8f1aab8-1b0d-4522-b523-ebe57c821251_delivery_1",
+    "22a76ae6-8845-4c11-9024-87a931a562d4_delivery_3",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_8",
+    "42b17714-ec3a-4e3c-aee3-d5546dac99c5_delivery_4",
+    "9fbcf9db-53e4-450a-ad35-217b61a7b20d_delivery_6",
+    "WhatsApp Video 2026-07-18 at 13.03.48",
+    "camera2_clip_20260531_165921_1203",
+    "camera2_clip_20260530_174735_1594"
+  ],
+  "test_videos": [
+    "camera2_clip_20260608_174532_4908",
+    "ecfa47cb-ce9d-4ea1-b098-ab201b432253_delivery_9",
+    "07578356-0cd9-4560-8c04-398e9bd2276b_delivery_2",
+    "4cf6dde3-f462-4d7c-874f-cac17c62beaf_delivery_1",
+    "cda3cfaa-53c1-4fc8-aa6b-3b840f7011ff_delivery_1",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_23",
+    "camera2_clip_20260531_180828_3886",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_10",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_5",
+    "2528ff4e-de60-4e30-8b17-d238eca61e70_delivery_14",
+    "4ba3683f-68ea-4591-b7f8-3d686aa06c86_delivery_1",
+    "5a6ce153-df78-40af-93e5-405f760e711d_delivery_4",
+    "4cf6dde3-f462-4d7c-874f-cac17c62beaf_delivery_5",
+    "d36809d4-cae5-4680-96d9-ccb64afe7f35_delivery_2",
+    "d0af424c-4a9e-4411-b2c2-05526f9e2f7f_delivery_12",
+    "22a8931b-59a5-40b6-aa97-89c11d506144_delivery_4",
+    "71b3801d-294d-45ab-b431-ffee076bddbd_delivery_4",
+    "0fb53ca9-0b80-4250-a522-c4218405d780_delivery_6"
+  ],
+  "skipped": {
+    "included_without_labels": 52,
+    "too_short": 8,
+    "no_active_phase": 0,
+    "active_longer_than_sequence": 0
+  },
+  "sample_windows": [
+    {
+      "video_id": "008330cf-9d1e-41b5-8bcf-7a233788ad3a_delivery_14",
+      "start_frame": 22,
+      "end_frame": 101,
+      "active_start_frame": 32,
+      "active_end_frame": 90
+    },
+    {
+      "video_id": "008330cf-9d1e-41b5-8bcf-7a233788ad3a_delivery_1",
+      "start_frame": 22,
+      "end_frame": 101,
+      "active_start_frame": 25,
+      "active_end_frame": 98
+    },
+    {
+      "video_id": "008330cf-9d1e-41b5-8bcf-7a233788ad3a_delivery_5",
+      "start_frame": 71,
+      "end_frame": 150,
+      "active_start_frame": 76,
+      "active_end_frame": 144
+    },
+    {
+      "video_id": "008330cf-9d1e-41b5-8bcf-7a233788ad3a_delivery_7",
+      "start_frame": 55,
+      "end_frame": 134,
+      "active_start_frame": 60,
+      "active_end_frame": 128
+    },
+    {
+      "video_id": "00e39b89-84a3-4095-b669-719634933843_delivery_22",
+      "start_frame": 9,
+      "end_frame": 88,
+      "active_start_frame": 51,
+      "active_end_frame": 88
+    },
+    {
+      "video_id": "07578356-0cd9-4560-8c04-398e9bd2276b_delivery_2",
+      "start_frame": 9,
+      "end_frame": 88,
+      "active_start_frame": 50,
+      "active_end_frame": 74
+    },
+    {
+      "video_id": "0fb53ca9-0b80-4250-a522-c4218405d780_delivery_6",
+      "start_frame": 9,
+      "end_frame": 88,
+      "active_start_frame": 27,
+      "active_end_frame": 69
+    },
+    {
+      "video_id": "1422e687-d176-44a4-819e-2c10a141a682_delivery_1",
+      "start_frame": 43,
+      "end_frame": 122,
+      "active_start_frame": 68,
+      "active_end_frame": 97
+    },
+    {
+      "video_id": "1422e687-d176-44a4-819e-2c10a141a682_delivery_2",
+      "start_frame": 32,
+      "end_frame": 111,
+      "active_start_frame": 54,
+      "active_end_frame": 89
+    },
+    {
+      "video_id": "1422e687-d176-44a4-819e-2c10a141a682_delivery_3",
+      "start_frame": 11,
+      "end_frame": 90,
+      "active_start_frame": 35,
+      "active_end_frame": 66
+    },
+    {
+      "video_id": "178abe9f-dc3a-45ac-89c9-566dba61bce9_delivery_10",
+      "start_frame": 85,
+      "end_frame": 164,
+      "active_start_frame": 98,
+      "active_end_frame": 162
+    },
+    {
+      "video_id": "1bb571ba-dc23-4fcb-9e77-70746e566ce1_delivery_2",
+      "start_frame": 13,
+      "end_frame": 92,
+      "active_start_frame": 33,
+      "active_end_frame": 75
+    },
+    {
+      "video_id": "21c1f521-f220-4a6e-83aa-71ca085845bf_delivery_13",
+      "start_frame": 0,
+      "end_frame": 79,
+      "active_start_frame": 11,
+      "active_end_frame": 58
+    },
+    {
+      "video_id": "21c1f521-f220-4a6e-83aa-71ca085845bf_delivery_14",
+      "start_frame": 0,
+      "end_frame": 79,
+      "active_start_frame": 5,
+      "active_end_frame": 68
+    },
+    {
+      "video_id": "22a76ae6-8845-4c11-9024-87a931a562d4_delivery_2",
+      "start_frame": 66,
+      "end_frame": 145,
+      "active_start_frame": 82,
+      "active_end_frame": 128
+    },
+    {
+      "video_id": "22a76ae6-8845-4c11-9024-87a931a562d4_delivery_3",
+      "start_frame": 51,
+      "end_frame": 130,
+      "active_start_frame": 56,
+      "active_end_frame": 124
+    },
+    {
+      "video_id": "22a8931b-59a5-40b6-aa97-89c11d506144_delivery_4",
+      "start_frame": 35,
+      "end_frame": 114,
+      "active_start_frame": 38,
+      "active_end_frame": 110
+    },
+    {
+      "video_id": "2528ff4e-de60-4e30-8b17-d238eca61e70_delivery_14",
+      "start_frame": 9,
+      "end_frame": 88,
+      "active_start_frame": 41,
+      "active_end_frame": 88
+    },
+    {
+      "video_id": "2d36b9ce-c540-4fce-afae-1320568ec687_delivery_7",
+      "start_frame": 50,
+      "end_frame": 129,
+      "active_start_frame": 50,
+      "active_end_frame": 129
+    },
+    {
+      "video_id": "3658b9c7-b70d-4cc4-af20-3b324ba0a954_delivery_11",
+      "start_frame": 37,
+      "end_frame": 116,
+      "active_start_frame": 38,
+      "active_end_frame": 114
+    },
+    {
+      "video_id": "42b17714-ec3a-4e3c-aee3-d5546dac99c5_delivery_4",
+      "start_frame": 69,
+      "end_frame": 148,
+      "active_start_frame": 71,
+      "active_end_frame": 146
+    },
+    {
+      "video_id": "479038b4-6281-4885-99d9-236a1dbf8b4e_delivery_1",
+      "start_frame": 7,
+      "end_frame": 86,
+      "active_start_frame": 12,
+      "active_end_frame": 80
+    },
+    {
+      "video_id": "4af4f6b5-b557-4bf1-9cb5-76fc669915e8_delivery_15",
+      "start_frame": 0,
+      "end_frame": 79,
+      "active_start_frame": 18,
+      "active_end_frame": 48
+    },
+    {
+      "video_id": "4af4f6b5-b557-4bf1-9cb5-76fc669915e8_delivery_1",
+      "start_frame": 0,
+      "end_frame": 79,
+      "active_start_frame": 15,
+      "active_end_frame": 42
+    },
+    {
+      "video_id": "4ba3683f-68ea-4591-b7f8-3d686aa06c86_delivery_1",
+      "start_frame": 1,
+      "end_frame": 80,
+      "active_start_frame": 46,
+      "active_end_frame": 76
+    },
+    {
+      "video_id": "4cf07982-ddd4-4196-bcde-ae1f618e1dba_delivery_16",
+      "start_frame": 41,
+      "end_frame": 120,
+      "active_start_frame": 46,
+      "active_end_frame": 114
+    },
+    {
+      "video_id": "4cf6dde3-f462-4d7c-874f-cac17c62beaf_delivery_1",
+      "start_frame": 5,
+      "end_frame": 84,
+      "active_start_frame": 23,
+      "active_end_frame": 75
+    },
+    {
+      "video_id": "4cf6dde3-f462-4d7c-874f-cac17c62beaf_delivery_5",
+      "start_frame": 11,
+      "end_frame": 90,
+      "active_start_frame": 27,
+      "active_end_frame": 90
+    },
+    {
+      "video_id": "4cf6dde3-f462-4d7c-874f-cac17c62beaf_delivery_7",
+      "start_frame": 9,
+      "end_frame": 88,
+      "active_start_frame": 36,
+      "active_end_frame": 88
+    },
+    {
+      "video_id": "4f1c3ef4-bef8-472e-87ff-a9a418067ac8_delivery_1",
+      "start_frame": 44,
+      "end_frame": 123,
+      "active_start_frame": 59,
+      "active_end_frame": 107
+    },
+    {
+      "video_id": "57611182-24f2-4793-9bb8-aa9687f4096b_delivery_1",
+      "start_frame": 0,
+      "end_frame": 79,
+      "active_start_frame": 14,
+      "active_end_frame": 53
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_10",
+      "start_frame": 53,
+      "end_frame": 132,
+      "active_start_frame": 61,
+      "active_end_frame": 123
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_19",
+      "start_frame": 53,
+      "end_frame": 132,
+      "active_start_frame": 59,
+      "active_end_frame": 125
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_23",
+      "start_frame": 57,
+      "end_frame": 136,
+      "active_start_frame": 56,
+      "active_end_frame": 138
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_24",
+      "start_frame": 57,
+      "end_frame": 136,
+      "active_start_frame": 56,
+      "active_end_frame": 137
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_2",
+      "start_frame": 73,
+      "end_frame": 152,
+      "active_start_frame": 90,
+      "active_end_frame": 134
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_30",
+      "start_frame": 62,
+      "end_frame": 141,
+      "active_start_frame": 68,
+      "active_end_frame": 134
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_32",
+      "start_frame": 65,
+      "end_frame": 144,
+      "active_start_frame": 59,
+      "active_end_frame": 151
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_3",
+      "start_frame": 65,
+      "end_frame": 144,
+      "active_start_frame": 68,
+      "active_end_frame": 140
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_4",
+      "start_frame": 70,
+      "end_frame": 149,
+      "active_start_frame": 79,
+      "active_end_frame": 140
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_5",
+      "start_frame": 65,
+      "end_frame": 144,
+      "active_start_frame": 81,
+      "active_end_frame": 128
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_6",
+      "start_frame": 62,
+      "end_frame": 141,
+      "active_start_frame": 80,
+      "active_end_frame": 123
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_7",
+      "start_frame": 63,
+      "end_frame": 142,
+      "active_start_frame": 72,
+      "active_end_frame": 132
+    },
+    {
+      "video_id": "5a6ce153-df78-40af-93e5-405f760e711d_delivery_8",
+      "start_frame": 76,
+      "end_frame": 155,
+      "active_start_frame": 82,
+      "active_end_frame": 148
+    },
+    {
+      "video_id": "5e2d3ff3-4182-41c2-9433-a775bde0e954_delivery_22",
+      "start_frame": 9,
+      "end_frame": 88,
+      "active_start_frame": 10,
+      "active_end_frame": 86
+    },
+    {
+      "video_id": "5e2d3ff3-4182-41c2-9433-a775bde0e954_delivery_23",
+      "start_frame": 13,
+      "end_frame": 92,
+      "active_start_frame": 6,
+      "active_end_frame": 99
+    },
+    {
+      "video_id": "6a8973e9-f387-4afc-a16d-e5c5db2892ec_delivery_12",
+      "start_frame": 55,
+      "end_frame": 134,
+      "active_start_frame": 39,
+      "active_end_frame": 150
+    },
+    {
+      "video_id": "6c4a2070-b534-47fc-ab1a-2ed0c8a6b73e_delivery_3",
+      "start_frame": 37,
+      "end_frame": 116,
+      "active_start_frame": 27,
+      "active_end_frame": 126
+    },
+    {
+      "video_id": "71b3801d-294d-45ab-b431-ffee076bddbd_delivery_4",
+      "start_frame": 85,
+      "end_frame": 164,
+      "active_start_frame": 89,
+      "active_end_frame": 160
+    },
+    {
+      "video_id": "77417906-e1c4-4717-9419-5bf7bda6f076_delivery_1",
+      "start_frame": 0,
+      "end_frame": 79,
+      "active_start_frame": 41,
+      "active_end_frame": 73
+    },
+    {
+      "video_id": "89364d92-73c7-42d3-8ab3-f3cac42cce44_delivery_7",
+      "start_frame": 69,
+      "end_frame": 148,
+      "active_start_frame": 65,
+      "active_end_frame": 152
+    },
+    {
+      "video_id": "8a5a45f1-f089-4401-9911-ceb005ec8671_delivery_1",
+      "start_frame": 78,
+      "end_frame": 157,
+      "active_start_frame": 99,
+      "active_end_frame": 135
+    },
+    {
+      "video_id": "8c22159b-91b8-48b9-9696-ce3925b7a484_delivery_1",
+      "start_frame": 12,
+      "end_frame": 91,
+      "active_start_frame": 30,
+      "active_end_frame": 73
+    },
+    {
+      "video_id": "970a5984-8294-4ed3-9a12-c76d7a27f97f_delivery_2",
+      "start_frame": 30,
+      "end_frame": 109,
+      "active_start_frame": 50,
+      "active_end_frame": 88
+    },
+    {
+      "video_id": "9d43c8ca-67d4-49a5-b3ca-7930ad933230_delivery_1",
+      "start_frame": 11,
+      "end_frame": 90,
+      "active_start_frame": 42,
+      "active_end_frame": 76
+    },
+    {
+      "video_id": "9d43c8ca-67d4-49a5-b3ca-7930ad933230_delivery_2",
+      "start_frame": 5,
+      "end_frame": 84,
+      "active_start_frame": 27,
+      "active_end_frame": 61
+    },
+    {
+      "video_id": "9d43c8ca-67d4-49a5-b3ca-7930ad933230_delivery_3",
+      "start_frame": 11,
+      "end_frame": 90,
+      "active_start_frame": 42,
+      "active_end_frame": 75
+    },
+    {
+      "video_id": "9d43c8ca-67d4-49a5-b3ca-7930ad933230_delivery_9",
+      "start_frame": 1,
+      "end_frame": 80,
+      "active_start_frame": 22,
+      "active_end_frame": 59
+    },
+    {
+      "video_id": "9fbcf9db-53e4-450a-ad35-217b61a7b20d_delivery_6",
+      "start_frame": 56,
+      "end_frame": 135,
+      "active_start_frame": 83,
+      "active_end_frame": 108
+    },
+    {
+      "video_id": "a3995f18-4d84-4167-bcb9-315280a79673_delivery_5",
+      "start_frame": 7,
+      "end_frame": 86,
+      "active_start_frame": 17,
+      "active_end_frame": 75
+    },
+    {
+      "video_id": "b2a503a6-a533-4248-8f91-0f3278df91df_delivery_1",
+      "start_frame": 9,
+      "end_frame": 88,
+      "active_start_frame": 13,
+      "active_end_frame": 84
+    },
+    {
+      "video_id": "b782f0fb-af7e-49aa-8dfa-ce8a8274e3eb_delivery_3",
+      "start_frame": 30,
+      "end_frame": 109,
+      "active_start_frame": 34,
+      "active_end_frame": 105
+    },
+    {
+      "video_id": "c205fd81-5a0b-458a-939f-c45fdfc8d6e5_delivery_1",
+      "start_frame": 9,
+      "end_frame": 88,
+      "active_start_frame": 32,
+      "active_end_frame": 82
+    },
+    {
+      "video_id": "c205fd81-5a0b-458a-939f-c45fdfc8d6e5_delivery_2",
+      "start_frame": 12,
+      "end_frame": 91,
+      "active_start_frame": 33,
+      "active_end_frame": 69
+    },
+    {
+      "video_id": "c44abd22-0712-47a2-9654-07fc4ac380bb_delivery_6",
+      "start_frame": 46,
+      "end_frame": 125,
+      "active_start_frame": 45,
+      "active_end_frame": 126
+    },
+    {
+      "video_id": "c84b9ad5-2640-4fe2-b9b8-0145d58c17f9_delivery_2",
+      "start_frame": 4,
+      "end_frame": 83,
+      "active_start_frame": 9,
+      "active_end_frame": 78
+    },
+    {
+      "video_id": "camera2_clip_20260308_162424_74335",
+      "start_frame": 55,
+      "end_frame": 134,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260318_190437_156428",
+      "start_frame": 63,
+      "end_frame": 142,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260318_190437_278671",
+      "start_frame": 61,
+      "end_frame": 140,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260318_200417_649384",
+      "start_frame": 53,
+      "end_frame": 132,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260408_191227_91706",
+      "start_frame": 56,
+      "end_frame": 135,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260408_192238_174043",
+      "start_frame": 57,
+      "end_frame": 136,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260408_192937_211753",
+      "start_frame": 51,
+      "end_frame": 130,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260524_093937_47384",
+      "start_frame": 56,
+      "end_frame": 135,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260524_093938_62712",
+      "start_frame": 51,
+      "end_frame": 130,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260527_112309_4642",
+      "start_frame": 44,
+      "end_frame": 123,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260528_123150_12473",
+      "start_frame": 50,
+      "end_frame": 129,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260529_170016_1433",
+      "start_frame": 56,
+      "end_frame": 135,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260530_072246_48360",
+      "start_frame": 53,
+      "end_frame": 132,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260530_072726_24862",
+      "start_frame": 62,
+      "end_frame": 141,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260530_072726_46948",
+      "start_frame": 62,
+      "end_frame": 141,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260530_174735_1594",
+      "start_frame": 31,
+      "end_frame": 110,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260531_093203_23097",
+      "start_frame": 51,
+      "end_frame": 130,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260531_161804_1160",
+      "start_frame": 52,
+      "end_frame": 131,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260531_165921_1203",
+      "start_frame": 33,
+      "end_frame": 112,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260531_180828_3886",
+      "start_frame": 31,
+      "end_frame": 110,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260601_090824_4131",
+      "start_frame": 2,
+      "end_frame": 81,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260601_155515_6106",
+      "start_frame": 0,
+      "end_frame": 79,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260601_174715_574949",
+      "start_frame": 57,
+      "end_frame": 136,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260601_184452_6964",
+      "start_frame": 4,
+      "end_frame": 83,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260602_155415_5174",
+      "start_frame": 3,
+      "end_frame": 82,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260604_162209_31061",
+      "start_frame": 65,
+      "end_frame": 144,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260604_162209_5829",
+      "start_frame": 62,
+      "end_frame": 141,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260606_174905_16125",
+      "start_frame": 23,
+      "end_frame": 102,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260606_214146_28201",
+      "start_frame": 53,
+      "end_frame": 132,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260608_174532_4908",
+      "start_frame": 64,
+      "end_frame": 143,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260608_182314_91546",
+      "start_frame": 63,
+      "end_frame": 142,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260609_174330_7268",
+      "start_frame": 46,
+      "end_frame": 125,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260609_183427_18983",
+      "start_frame": 63,
+      "end_frame": 142,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260614_182154_35444",
+      "start_frame": 57,
+      "end_frame": 136,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "camera2_clip_20260614_182155_117578",
+      "start_frame": 59,
+      "end_frame": 138,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "cda3cfaa-53c1-4fc8-aa6b-3b840f7011ff_delivery_1",
+      "start_frame": 4,
+      "end_frame": 83,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "d0af424c-4a9e-4411-b2c2-05526f9e2f7f_delivery_12",
+      "start_frame": 98,
+      "end_frame": 177,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "d0af424c-4a9e-4411-b2c2-05526f9e2f7f_delivery_17",
+      "start_frame": 105,
+      "end_frame": 184,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "d0af424c-4a9e-4411-b2c2-05526f9e2f7f_delivery_22",
+      "start_frame": 87,
+      "end_frame": 166,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "d0af424c-4a9e-4411-b2c2-05526f9e2f7f_delivery_2",
+      "start_frame": 83,
+      "end_frame": 162,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "d36809d4-cae5-4680-96d9-ccb64afe7f35_delivery_2",
+      "start_frame": 28,
+      "end_frame": 107,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "d62173bf-f836-4738-a7fb-22a64611af02_delivery_7",
+      "start_frame": 38,
+      "end_frame": 117,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "dbaac1cb-ecef-4650-a767-3c716a86af39_delivery_1",
+      "start_frame": 20,
+      "end_frame": 99,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "e0f3a7a0-f933-419b-844b-9e9b22f18db5_delivery_10",
+      "start_frame": 12,
+      "end_frame": 91,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "ecfa47cb-ce9d-4ea1-b098-ab201b432253_delivery_9",
+      "start_frame": 1,
+      "end_frame": 80,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "ed7525a9-fbb6-4a21-bdbd-71bcf0d779f9_delivery_8",
+      "start_frame": 16,
+      "end_frame": 95,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "f241dac4-644d-47f1-9b40-58f3adbeb395_delivery_3",
+      "start_frame": 7,
+      "end_frame": 86,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "f8f1aab8-1b0d-4522-b523-ebe57c821251_delivery_1",
+      "start_frame": 3,
+      "end_frame": 82,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "multi_pose_delivery_15",
+      "start_frame": 4,
+      "end_frame": 83,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "WhatsApp Video 2026-07-18 at 13.03.46",
+      "start_frame": 13,
+      "end_frame": 92,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "WhatsApp Video 2026-07-18 at 13.03.48",
+      "start_frame": 13,
+      "end_frame": 92,
+      "active_start_frame": null,
+      "active_end_frame": null
+    },
+    {
+      "video_id": "WhatsApp Video 2026-07-18 at 13.03.50",
+      "start_frame": 13,
+      "end_frame": 92,
+      "active_start_frame": null,
+      "active_end_frame": null
+    }
+  ],
+  "total_params": 938692
+}

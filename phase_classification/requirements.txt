@@ -1,0 +1,6 @@
+numpy
+pandas
+torch>=2.5
+scikit-learn
+opencv-python
+openpyxl
