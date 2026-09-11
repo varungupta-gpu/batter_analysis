@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "feature_video_sets": 126,
+  "manually_labeled": 71,
+  "source_videos": 179,
+  "additional_source_only_videos": 53,
+  "train_videos": 100,
+  "test_videos": 18,
+  "model_features": 61,
+  "schema_zero_fill_files": 6,
+  "loader_notes": {
+    "included_without_labels": 52,
+    "too_short": 8,
+    "no_active_phase": 0,
+    "active_longer_than_sequence": 0
+  },
+  "checkpoint_forward_shape": [
+    118,
+    80,
+    4
+  ],
+  "checks": [
+    "checkpoint metadata and weights",
+    "disjoint saved split",
+    "exact saved sample windows",
+    "video bounds and sequential decoding",
+    "unique ordered identical keypoint/feature frames",
+    "manual label frame and video IDs",
+    "finite inference for every saved model sample"
+  ]
+}
